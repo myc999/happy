@@ -1,5 +1,5 @@
 {
-  "name": "aif4",
+  "name": "@aif4/aif4",
   "version": "1.1.10-beta.7",
   "description": "Mobile and Web client for Claude Code and Codex",
   "author": "myc999",
@@ -9,11 +9,11 @@
   "bugs": "https://github.com/myc999/happy/issues",
   "repository": {
     "type": "git",
-    "url": "https://github.com/myc999/happy"
+    "url": "git+https://github.com/myc999/happy.git"
   },
   "bin": {
-    "aif4": "./bin/aif4.mjs",
-    "aif4-mcp": "./bin/aif4-mcp.mjs"
+    "aif4": "bin/aif4",
+    "aif4-mcp": "bin/aif4-mcp"
   },
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
