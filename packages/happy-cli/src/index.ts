@@ -441,7 +441,7 @@ Conversation history is preserved on the server, but in-flight tool calls are in
     return;
   } else if (subcommand === 'logout') {
     // Keep for backward compatibility - redirect to auth logout
-    console.log(chalk.yellow('Note: "happy logout" is deprecated. Use "happy auth logout" instead.\n'));
+    console.log(chalk.yellow('Note: "aif4 logout" is deprecated. Use "aif4 auth logout" instead.\n'));
     try {
       await handleAuthCommand(['logout']);
     } catch (error) {
@@ -558,20 +558,20 @@ Conversation history is preserved on the server, but in-flight tool calls are in
       }
     } else {
       console.log(`
-${chalk.bold('happy daemon')} - Daemon management
+${chalk.bold('aif4 daemon')} - Daemon management
 
 ${chalk.bold('Usage:')}
-  happy daemon start              Start the daemon (detached)
-  happy daemon stop               Stop the daemon (sessions stay alive)
-  happy daemon status             Show daemon status
-  happy daemon list               List active sessions
+  aif4 daemon start              Start the daemon (detached)
+  aif4 daemon stop               Stop the daemon (sessions stay alive)
+  aif4 daemon status             Show daemon status
+  aif4 daemon list               List active sessions
 
-  If you want to kill all happy related processes run 
-  ${chalk.cyan('happy doctor clean')}
+  If you want to kill all aif4 related processes run
+  ${chalk.cyan('aif4 doctor clean')}
 
 ${chalk.bold('Note:')} The daemon runs in the background and manages Claude sessions.
 
-${chalk.bold('To clean up runaway processes:')} Use ${chalk.cyan('happy doctor clean')}
+${chalk.bold('To clean up runaway processes:')} Use ${chalk.cyan('aif4 doctor clean')}
 `)
     }
     return;
@@ -604,7 +604,7 @@ ${chalk.bold('To clean up runaway processes:')} Use ${chalk.cyan('happy doctor c
         showVersion = true
         // Also pass through to claude (will show after our version)
         unknownArgs.push(arg)
-      } else if (arg === '--happy-starting-mode') {
+      } else if (arg === '--aif4-starting-mode') {
         options.startingMode = z.enum(['local', 'remote']).parse(args[++i])
       } else if (arg === '--yolo') {
         // Shortcut for --dangerously-skip-permissions
@@ -642,7 +642,7 @@ ${chalk.bold('To clean up runaway processes:')} Use ${chalk.cyan('happy doctor c
       } else if (arg === '--settings') {
         // Intercept --settings flag - Happy uses this internally for session hooks
         const settingsValue = args[++i] // consume the value
-        console.warn(chalk.yellow(`⚠️  Warning: --settings is used internally by Happy for session tracking.`))
+        console.warn(chalk.yellow(`⚠️  Warning: --settings is used internally by AIF4 for session tracking.`))
         console.warn(chalk.yellow(`   Your settings file "${settingsValue}" will be ignored.`))
         console.warn(chalk.yellow(`   To configure Claude, edit ~/.claude/settings.json instead.`))
         // Don't pass through to claudeArgs
@@ -671,43 +671,43 @@ ${chalk.bold('To clean up runaway processes:')} Use ${chalk.cyan('happy doctor c
     // Show help
     if (showHelp) {
       console.log(`
-${chalk.bold('happy')} - Claude Code On the Go
+${chalk.bold('aif4')} - Claude Code On the Go
 
 ${chalk.bold('Usage:')}
-  happy [options]         Start Claude with mobile control
-  happy auth              Manage authentication
-  happy resume            Resume a previous Happy session by Happy session ID
-  happy codex             Start Codex mode
-  happy gemini            Start Gemini mode (ACP)
-  happy acp               Start a generic ACP-compatible agent
-  happy connect           Connect AI vendor API keys
-  happy sandbox           Configure and manage OS-level sandboxing
-  happy notify            Send push notification
-  happy daemon            Manage background service that allows
+  aif4 [options]         Start Claude with mobile control
+  aif4 auth              Manage authentication
+  aif4 resume            Resume a previous AIF4 session by AIF4 session ID
+  aif4 codex             Start Codex mode
+  aif4 gemini            Start Gemini mode (ACP)
+  aif4 acp               Start a generic ACP-compatible agent
+  aif4 connect           Connect AI vendor API keys
+  aif4 sandbox           Configure and manage OS-level sandboxing
+  aif4 notify            Send push notification
+  aif4 daemon            Manage background service that allows
                             to spawn new sessions away from your computer
-  happy doctor            System diagnostics & troubleshooting
+  aif4 doctor            System diagnostics & troubleshooting
 
 ${chalk.bold('Examples:')}
-  happy                    Start session
-  happy resume cmmij8      Resume a previous session by Happy session ID
-  happy --yolo             Start with bypassing permissions
-                            happy sugar for --dangerously-skip-permissions
-  happy --chrome           Enable Chrome browser access for this session
-  happy --no-chrome        Disable Chrome even if default is on
-  happy --no-sandbox       Disable Happy sandbox for this session
-  happy --js-runtime bun   Use bun instead of node to spawn Claude Code
-  happy --claude-env ANTHROPIC_BASE_URL=http://127.0.0.1:3456
+  aif4                    Start session
+  aif4 resume cmmij8      Resume a previous session by AIF4 session ID
+  aif4 --yolo             Start with bypassing permissions
+                            aif4 sugar for --dangerously-skip-permissions
+  aif4 --chrome           Enable Chrome browser access for this session
+  aif4 --no-chrome        Disable Chrome even if default is on
+  aif4 --no-sandbox       Disable AIF4 sandbox for this session
+  aif4 --js-runtime bun   Use bun instead of node to spawn Claude Code
+  aif4 --claude-env ANTHROPIC_BASE_URL=http://127.0.0.1:3456
                            Use a custom API endpoint (e.g., claude-code-router)
-  happy acp gemini         Start Gemini via generic ACP runner
-  happy acp -- opencode --acp
+  aif4 acp gemini         Start Gemini via generic ACP runner
+  aif4 acp -- opencode --acp
                            Start a custom ACP command
-  happy acp opencode --verbose
+  aif4 acp opencode --verbose
                            Print raw ACP backend/envelope events
-  happy auth login --force Authenticate
-  happy doctor             Run diagnostics
+  aif4 auth login --force Authenticate
+  aif4 doctor             Run diagnostics
 
-${chalk.bold('Happy supports ALL Claude options!')}
-  Use any claude flag with happy as you would with claude. Our favorite:
+${chalk.bold('AIF4 supports ALL Claude options!')}
+  Use any claude flag with aif4 as you would with claude. Our favorite:
 
   happy --resume
 
@@ -729,7 +729,7 @@ ${chalk.bold.cyan('Claude Code Options (from `claude --help`):')}
 
     // Show version
     if (showVersion) {
-      console.log(`happy version: ${packageJson.version}`)
+      console.log(`aif4 version: ${packageJson.version}`)
       // Don't exit - continue to pass --version to Claude Code
     }
 
@@ -779,34 +779,34 @@ async function handleNotifyCommand(args: string[]): Promise<void> {
 
   if (showHelp) {
     console.log(`
-${chalk.bold('happy notify')} - Send notification
+${chalk.bold('aif4 notify')} - Send notification
 
 ${chalk.bold('Usage:')}
-  happy notify -p <message> [-t <title>]    Send notification with custom message and optional title
-  happy notify -h, --help                   Show this help
+  aif4 notify -p <message> [-t <title>]    Send notification with custom message and optional title
+  aif4 notify -h, --help                   Show this help
 
 ${chalk.bold('Options:')}
   -p <message>    Notification message (required)
-  -t <title>      Notification title (optional, defaults to "Happy")
+  -t <title>      Notification title (optional, defaults to "AIF4")
 
 ${chalk.bold('Examples:')}
-  happy notify -p "Deployment complete!"
-  happy notify -p "System update complete" -t "Server Status"
-  happy notify -t "Alert" -p "Database connection restored"
+  aif4 notify -p "Deployment complete!"
+  aif4 notify -p "System update complete" -t "Server Status"
+  aif4 notify -t "Alert" -p "Database connection restored"
 `)
     return
   }
 
   if (!message) {
     console.error(chalk.red('Error: Message is required. Use -p "your message" to specify the notification text.'))
-    console.log(chalk.gray('Run "happy notify --help" for usage information.'))
+    console.log(chalk.gray('Run "aif4 notify --help" for usage information.'))
     process.exit(1)
   }
 
   // Load credentials
   let credentials = await readCredentials()
   if (!credentials) {
-    console.error(chalk.red('Error: Not authenticated. Please run "happy auth login" first.'))
+    console.error(chalk.red('Error: Not authenticated. Please run "aif4 auth login" first.'))
     process.exit(1)
   }
 
@@ -817,7 +817,7 @@ ${chalk.bold('Examples:')}
     const api = await ApiClient.create(credentials);
 
     // Use custom title or default to "Happy"
-    const notificationTitle = title || 'Happy'
+    const notificationTitle = title || 'AIF4'
 
     // Send the push notification
     api.push().sendToAllDevices(

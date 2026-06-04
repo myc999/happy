@@ -22,10 +22,10 @@ import packageJson from '../../package.json'
 export function getEnvironmentInfo(): Record<string, any> {
     return {
         PWD: process.env.PWD,
-        HAPPY_HOME_DIR: process.env.HAPPY_HOME_DIR,
-        HAPPY_VARIANT: process.env.HAPPY_VARIANT,
-        HAPPY_SERVER_URL: process.env.HAPPY_SERVER_URL,
-        HAPPY_PROJECT_ROOT: process.env.HAPPY_PROJECT_ROOT,
+        AIF4_HOME_DIR: process.env.AIF4_HOME_DIR,
+        AIF4_VARIANT: process.env.AIF4_VARIANT,
+        AIF4_SERVER_URL: process.env.AIF4_SERVER_URL,
+        AIF4_PROJECT_ROOT: process.env.AIF4_PROJECT_ROOT,
         DANGEROUSLY_LOG_TO_SERVER_FOR_AI_AUTO_DEBUGGING: process.env.DANGEROUSLY_LOG_TO_SERVER_FOR_AI_AUTO_DEBUGGING,
         NODE_ENV: process.env.NODE_ENV,
         DEBUG: process.env.DEBUG,
@@ -94,14 +94,14 @@ export async function runDoctorDaemon(): Promise<void> {
         console.log(chalk.red('❌ Error checking daemon status'));
     }
 
-    console.log(chalk.gray('\nRun `happy doctor` for full diagnostics.\n'));
+    console.log(chalk.gray('\nRun `aif4 doctor` for full diagnostics.\n'));
 }
 
 /**
  * Full doctor diagnostics — verbose sections first, concise useful info last
  */
 export async function runDoctorCommand(): Promise<void> {
-    console.log(chalk.bold.cyan('\n🩺 Happy CLI Doctor\n'));
+    console.log(chalk.bold.cyan('\n🩺 AIF4 CLI Doctor\n'));
 
     // ── Verbose sections first (scroll off the top) ──
 
@@ -109,7 +109,7 @@ export async function runDoctorCommand(): Promise<void> {
     try {
         const allProcesses = await findAllHappyProcesses();
         if (allProcesses.length > 0) {
-            console.log(chalk.bold('🔍 All Happy CLI Processes'));
+            console.log(chalk.bold('🔍 All AIF4 CLI Processes'));
 
             const grouped = allProcesses.reduce((groups, process) => {
                 if (!groups[process.type]) groups[process.type] = [];
@@ -144,10 +144,10 @@ export async function runDoctorCommand(): Promise<void> {
 
             if (allProcesses.length > 1) {
                 console.log(chalk.bold('\n💡 Process Management'));
-                console.log(chalk.gray('To clean up runaway processes: happy doctor clean'));
+                console.log(chalk.gray('To clean up runaway processes: aif4 doctor clean'));
             }
         } else {
-            console.log(chalk.red('❌ No happy processes found'));
+            console.log(chalk.red('❌ No aif4 processes found'));
         }
     } catch (error) {
         console.log(chalk.red('❌ Error listing processes'));
@@ -192,7 +192,7 @@ export async function runDoctorCommand(): Promise<void> {
     // Daemon spawn diagnostics
     console.log(chalk.bold('\n🔧 Daemon Spawn Diagnostics'));
     const projectRoot = projectPath();
-    const wrapperPath = join(projectRoot, 'bin', 'happy.mjs');
+    const wrapperPath = join(projectRoot, 'bin', 'aif4.mjs');
     const cliEntrypoint = join(projectRoot, 'dist', 'index.mjs');
     console.log(`Project Root: ${chalk.blue(projectRoot)}`);
     console.log(`Wrapper Script: ${chalk.blue(wrapperPath)}`);
@@ -203,8 +203,8 @@ export async function runDoctorCommand(): Promise<void> {
     // Environment variables
     console.log(chalk.bold('\n🌍 Environment Variables'));
     const env = getEnvironmentInfo();
-    console.log(`HAPPY_HOME_DIR: ${env.HAPPY_HOME_DIR ? chalk.green(env.HAPPY_HOME_DIR) : chalk.gray('not set')}`);
-    console.log(`HAPPY_SERVER_URL: ${env.HAPPY_SERVER_URL ? chalk.green(env.HAPPY_SERVER_URL) : chalk.gray('not set')}`);
+    console.log(`AIF4_HOME_DIR: ${env.AIF4_HOME_DIR ? chalk.green(env.AIF4_HOME_DIR) : chalk.gray('not set')}`);
+    console.log(`AIF4_SERVER_URL: ${env.AIF4_SERVER_URL ? chalk.green(env.AIF4_SERVER_URL) : chalk.gray('not set')}`);
     console.log(`DANGEROUSLY_LOG_TO_SERVER: ${env.DANGEROUSLY_LOG_TO_SERVER_FOR_AI_AUTO_DEBUGGING ? chalk.yellow('ENABLED') : chalk.gray('not set')}`);
     console.log(`DEBUG: ${env.DEBUG ? chalk.green(env.DEBUG) : chalk.gray('not set')}`);
     console.log(`NODE_ENV: ${env.NODE_ENV ? chalk.green(env.NODE_ENV) : chalk.gray('not set')}`);
@@ -221,20 +221,20 @@ export async function runDoctorCommand(): Promise<void> {
 
     // Support and bug reports
     console.log(chalk.bold('\n🐛 Support & Bug Reports'));
-    console.log(`Report issues: ${chalk.blue('https://github.com/slopus/happy-cli/issues')}`);
-    console.log(`Documentation: ${chalk.blue('https://happy.engineering/')}`);
+    console.log(`Report issues: ${chalk.blue('https://github.com/myc999/happy/issues')}`);
+    console.log(`Documentation: ${chalk.blue('https://github.com/myc999/happy')}`);
 
     // ── Concise useful info last (visible without scrolling) ──
 
     // Basic info
     console.log(chalk.bold('\n📋 Basic Information'));
-    console.log(`Happy CLI Version: ${chalk.green(packageJson.version)}`);
+    console.log(`AIF4 CLI Version: ${chalk.green(packageJson.version)}`);
     console.log(`Platform: ${chalk.green(process.platform)} ${process.arch}`);
     console.log(`Node.js Version: ${chalk.green(process.version)}`);
 
     // Configuration
     console.log(chalk.bold('\n⚙️  Configuration'));
-    console.log(`Happy Home: ${chalk.blue(configuration.happyHomeDir)}`);
+    console.log(`AIF4 Home: ${chalk.blue(configuration.happyHomeDir)}`);
     console.log(`Server URL: ${chalk.blue(configuration.serverUrl)}`);
     console.log(`Logs Dir: ${chalk.blue(configuration.logsDir)}`);
 

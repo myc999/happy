@@ -39,7 +39,7 @@ export async function doAuth(): Promise<Credentials | null> {
             supportsV2: true
         }, {
             headers: {
-                'X-Happy-Client': `cli/${configuration.currentCliVersion}`
+                'X-AIF4-Client': `cli/${configuration.currentCliVersion}`
             }
         });
         if (process.env.DEBUG) {
@@ -97,9 +97,9 @@ function selectAuthenticationMethod(): Promise<AuthMethod | null> {
 async function doMobileAuth(keypair: tweetnacl.BoxKeyPair): Promise<Credentials | null> {
     console.clear();
     console.log('\nMobile Authentication\n');
-    console.log('Scan this QR code with your Happy mobile app:\n');
+    console.log('Scan this QR code with your AIF4 mobile app:\n');
 
-    const authUrl = 'happy://terminal?' + encodeBase64Url(keypair.publicKey);
+    const authUrl = 'aif4://terminal?' + encodeBase64Url(keypair.publicKey);
     displayQRCode(authUrl);
 
     console.log('\nOr manually enter this URL:');
@@ -164,7 +164,7 @@ async function waitForAuthentication(keypair: tweetnacl.BoxKeyPair): Promise<Cre
                     supportsV2: true
                 }, {
                     headers: {
-                        'X-Happy-Client': `cli/${configuration.currentCliVersion}`
+                        'X-AIF4-Client': `cli/${configuration.currentCliVersion}`
                     }
                 });
                 if (response.data.state === 'authorized') {

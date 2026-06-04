@@ -18,7 +18,7 @@ import { logger } from '@/ui/logger';
 import { trimIdent } from '@/utils/trimIdent';
 import os from 'os';
 
-const PLIST_LABEL = 'com.happy-cli.daemon';
+const PLIST_LABEL = 'com.aif4-cli.daemon';
 const PLIST_FILE = `/Library/LaunchDaemons/${PLIST_LABEL}.plist`;
 
 // NOTE: Local installation like --local does not make too much sense I feel like

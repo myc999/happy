@@ -34,12 +34,12 @@ class Configuration {
     this.isDaemonProcess = args.length >= 2 && args[0] === 'daemon' && (args[1] === 'start-sync')
 
     // Directory configuration - Priority: HAPPY_HOME_DIR env > default home dir
-    if (process.env.HAPPY_HOME_DIR) {
+    if (process.env.AIF4_HOME_DIR) {
       // Expand ~ to home directory if present
-      const expandedPath = process.env.HAPPY_HOME_DIR.replace(/^~/, homedir())
+      const expandedPath = process.env.AIF4_HOME_DIR.replace(/^~/, homedir())
       this.happyHomeDir = expandedPath
     } else {
-      this.happyHomeDir = join(homedir(), '.happy')
+      this.happyHomeDir = join(homedir(), '.aif4')
     }
 
     this.logsDir = join(this.happyHomeDir, 'logs')
@@ -54,21 +54,21 @@ class Configuration {
     // webappUrl must follow the same chain as serverUrl, otherwise `happy server`
     // self-host points the API at localhost but auth still opens the prod webapp.
     this.serverUrl =
-      process.env.HAPPY_SERVER_URL ||
+      process.env.AIF4_SERVER_URL ||
       readSettingsStringSync(this.settingsFile, 'serverUrl') ||
       'https://api.cluster-fluster.com'
     this.webappUrl =
-      process.env.HAPPY_WEBAPP_URL ||
+      process.env.AIF4_WEBAPP_URL ||
       readSettingsStringSync(this.settingsFile, 'webappUrl') ||
       'https://app.happy.engineering'
 
-    this.isExperimentalEnabled = ['true', '1', 'yes'].includes(process.env.HAPPY_EXPERIMENTAL?.toLowerCase() || '');
-    this.disableCaffeinate = ['true', '1', 'yes'].includes(process.env.HAPPY_DISABLE_CAFFEINATE?.toLowerCase() || '');
+    this.isExperimentalEnabled = ['true', '1', 'yes'].includes(process.env.AIF4_EXPERIMENTAL?.toLowerCase() || '');
+    this.disableCaffeinate = ['true', '1', 'yes'].includes(process.env.AIF4_DISABLE_CAFFEINATE?.toLowerCase() || '');
 
     this.currentCliVersion = packageJson.version
 
     // Visual indicator on CLI startup (only if not daemon process to avoid log clutter)
-    const variant = process.env.HAPPY_VARIANT || 'stable'
+    const variant = process.env.AIF4_VARIANT || 'stable'
     if (!this.isDaemonProcess && variant === 'dev') {
       console.log('\x1b[33m🔧 DEV MODE\x1b[0m - Data: ' + this.happyHomeDir)
     }
