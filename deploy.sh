@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-IMAGE_TAR="/root/happy-server.tar.gz"
+IMAGE_TAR="/root/happy-claude/happy-server.tar.gz"
 CONTAINER_NAME="happy-server"
 PORT=3005
 MASTER_SECRET="b0b69f778d4464b50b13609af01b6b919fc19087ffd47a9317a87ed71c95e19c"

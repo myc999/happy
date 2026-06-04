@@ -70,6 +70,9 @@ docs/competition/opencode/traces/
 .cdp-scripts/
 happy-workspaces/
 
+# Docker build artifacts
+happy-server.tar.gz
+
 # local HAPPY_HOME_DIR for self-host testing
 .happy-fully-local/
 .happy-dev/
