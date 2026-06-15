@@ -35,6 +35,7 @@ export interface StartApiOptions {
 }
 
 export async function startApi(opts: StartApiOptions = {}) {
+    try { fs.writeFileSync('C:/happy-data/api_start.txt', JSON.stringify({staticDir: opts.staticDir, cwd: process.cwd(), argv: process.argv[1]})); } catch(e: any){ console.log('WRITE_FAIL:' + e.message); }
 
     // Configure
     log('Starting API...');
@@ -113,19 +114,70 @@ export async function startApi(opts: StartApiOptions = {}) {
     v3SessionRoutes(typed);
     attachmentRoutes(typed);
 
+    // Debug endpoint to check static serving
+    app.get('/v1/debug-test-xyz-12345', async (_req, reply) => {
+        const staticDir = opts.staticDir || 'NOT SET';
+        const testFile = opts.staticDir ? path.join(opts.staticDir, '_expo/static/js/web/index-e80e90dbdccdb86525ecd0c8746b23c8.js') : 'N/A';
+        const exists = opts.staticDir ? (() => { try { return fs.statSync(testFile).size; } catch(e: any) { return e.message; } })() : 'N/A';
+        const apiStartContent = (() => { try { return fs.readFileSync('C:/happy-data/api_start.txt', 'utf8'); } catch(_) { return 'missing'; } })();
+        return reply.send({ staticDir, testFile, exists, cwd: process.cwd(), apiStart: apiStartContent });
+    });
+
     // Static webapp (self-host mode)
     if (opts.staticDir) {
-        const fastifyStatic = (await import('@fastify/static')).default;
+        try { fs.writeFileSync(opts.staticDir + '/MARKER.txt', 'ran at ' + Date.now()); } catch(_) {}
+        console.error('[STATIC_BLOCK_START] staticDir=' + opts.staticDir);
         const injectScript = opts.injectHtmlConfig
             ? `<script>window.__HAPPY_CONFIG__ = ${JSON.stringify(opts.injectHtmlConfig)};</script>`
             : null;
-        app.register(fastifyStatic, {
-            root: opts.staticDir,
-            prefix: '/',
-            decorateReply: false,
-            // SPA fallback — if file not found, serve index.html
-            wildcard: false,
+        const MIME_TYPES: Record<string, string> = {
+            '.js': 'application/javascript; charset=utf-8',
+            '.css': 'text/css',
+            '.html': 'text/html; charset=utf-8',
+            '.ico': 'image/x-icon',
+            '.png': 'image/png',
+            '.json': 'application/json',
+            '.wasm': 'application/wasm',
+            '.map': 'application/json',
+        };
+        // Use raw http server event to serve static files before Fastify routing
+        // Serve ALL static files via raw HTTP listener (bypasses @fastify/static Windows issues)
+        const serverObj = app.server as any;
+        console.error('[SERVER_TYPE] type=' + typeof serverObj + ' constructor=' + serverObj?.constructor?.name + ' listenerCount=' + serverObj?.listenerCount?.('request'));
+        serverObj.prependListener('request', (req: any, res: any) => {
+            if (req.method !== 'GET' && req.method !== 'HEAD') return;
+            const url: string = (req.url || '').split('?')[0];
+            // Only intercept static asset paths
+            if (!url.startsWith('/_expo') && !url.startsWith('/assets') &&
+                !url.startsWith('/favicon') && !url.startsWith('/canvaskit') &&
+                url !== '/' && url !== '/index.html') return;
+            const filePath = path.join(opts.staticDir!, url === '/' ? 'index.html' : url);
+            res.setHeader('x-prepend-ran', '1');
+            try {
+                const stat = fs.statSync(filePath);
+                if (stat.isDirectory()) return;
+                const ext = path.extname(filePath).toLowerCase();
+                const mimeType = MIME_TYPES[ext] || 'application/octet-stream';
+                let data: Buffer = fs.readFileSync(filePath);
+                const isHtml = ext === '.html' || url === '/' || url === '/index.html';
+                if (isHtml && injectScript) {
+                    const html = data.toString('utf8').replace(/<head[^>]*>/i, (m) => `${m}\n${injectScript}`);
+                    data = Buffer.from(html, 'utf8');
+                }
+                res.writeHead(200, {
+                    'content-type': mimeType,
+                    'content-length': data.length,
+                    'cache-control': url === '/' || url === '/index.html' ? 'no-cache' : 'public, max-age=31536000',
+                    'access-control-allow-origin': '*',
+                    'x-served-by': 'prepend-listener',
+                });
+                res.end(req.method === 'HEAD' ? undefined : data);
+            } catch (e: any) {
+                // file not found - fall through
+                console.error('[STATIC_FAIL] url=' + url + ' fp=' + filePath + ' err=' + e.message);
+            }
         });
+        // @fastify/static removed - using prependListener for all static files
         if (injectScript) {
             app.addHook('onSend', async (request, reply, payload) => {
                 const url = request.raw.url || '';

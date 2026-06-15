@@ -3,7 +3,7 @@ CREATE TABLE "UserKVStore" (
     "id" TEXT NOT NULL,
     "accountId" TEXT NOT NULL,
     "key" TEXT NOT NULL,
-    "value" BYTEA,
+    "value" TEXT,
     "version" INTEGER NOT NULL DEFAULT 0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,

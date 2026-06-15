@@ -100,7 +100,7 @@ model Session {
     metadataVersion   Int              @default(0)
     agentState        String?
     agentStateVersion Int              @default(0)
-    dataEncryptionKey Bytes?
+    dataEncryptionKey String?
     seq               Int              @default(0)
     active            Boolean          @default(true)
     lastActiveAt      DateTime         @default(now())
@@ -137,7 +137,7 @@ model GithubUser {
     id        String    @id
     /// [GitHubProfile]
     profile   Json
-    token     Bytes?
+    token     String?
     createdAt DateTime  @default(now())
     updatedAt DateTime  @updatedAt
     Account   Account[]
@@ -210,7 +210,7 @@ model Machine {
     metadataVersion    Int         @default(0)
     daemonState        String? // Encrypted - contains dynamic daemon state
     daemonStateVersion Int         @default(0)
-    dataEncryptionKey  Bytes?
+    dataEncryptionKey  String?
     seq                Int         @default(0)
     active             Boolean     @default(true)
     lastActiveAt       DateTime    @default(now())
@@ -243,7 +243,7 @@ model ServiceAccountToken {
     accountId  String
     account    Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
     vendor     String
-    token      Bytes // Encrypted token
+    token      String // Encrypted token
     metadata   Json? // Optional vendor metadata
     lastUsedAt DateTime?
     createdAt  DateTime  @default(now())
@@ -261,11 +261,11 @@ model Artifact {
     id                String   @id // UUID provided by client
     accountId         String
     account           Account  @relation(fields: [accountId], references: [id])
-    header            Bytes // Encrypted header (can contain JSON)
+    header            String // Encrypted header (can contain JSON)
     headerVersion     Int      @default(0)
-    body              Bytes // Encrypted body
+    body              String // Encrypted body
     bodyVersion       Int      @default(0)
-    dataEncryptionKey Bytes // Encryption key for this artifact
+    dataEncryptionKey String // Encryption key for this artifact
     seq               Int      @default(0)
     createdAt         DateTime @default(now())
     updatedAt         DateTime @updatedAt
@@ -354,7 +354,7 @@ model UserKVStore {
     accountId String
     account   Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
     key       String   // Unencrypted for indexing
-    value     Bytes?   // Encrypted value, null when "deleted"
+    value     String?  // Encrypted value, null when "deleted"
     version   Int      @default(0)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

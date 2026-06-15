@@ -3,7 +3,7 @@ CREATE TABLE "ServiceAccountToken" (
     "id" TEXT NOT NULL,
     "accountId" TEXT NOT NULL,
     "vendor" TEXT NOT NULL,
-    "token" BYTEA NOT NULL,
+    "token" TEXT NOT NULL,
     "metadata" JSONB,
     "lastUsedAt" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,

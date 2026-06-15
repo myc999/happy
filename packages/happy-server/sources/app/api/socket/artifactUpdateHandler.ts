@@ -46,9 +46,9 @@ export function artifactUpdateHandler(userId: string, socket: Socket) {
                 result: 'success',
                 artifact: {
                     id: artifact.id,
-                    header: privacyKit.encodeBase64(artifact.header),
+                    header: artifact.header,
                     headerVersion: artifact.headerVersion,
-                    body: privacyKit.encodeBase64(artifact.body),
+                    body: artifact.body,
                     bodyVersion: artifact.bodyVersion,
                     seq: artifact.seq,
                     createdAt: artifact.createdAt.getTime(),
@@ -137,14 +137,14 @@ export function artifactUpdateHandler(userId: string, socket: Socket) {
                 if (headerMismatch) {
                     response.header = {
                         currentVersion: currentArtifact.headerVersion,
-                        currentData: privacyKit.encodeBase64(currentArtifact.header)
+                        currentData: currentArtifact.header
                     };
                 }
                 
                 if (bodyMismatch) {
                     response.body = {
                         currentVersion: currentArtifact.bodyVersion,
-                        currentData: privacyKit.encodeBase64(currentArtifact.body)
+                        currentData: currentArtifact.body
                     };
                 }
                 
@@ -162,7 +162,7 @@ export function artifactUpdateHandler(userId: string, socket: Socket) {
             let bodyUpdate: { value: string; version: number } | undefined;
 
             if (header) {
-                updateData.header = privacyKit.decodeBase64(header.data);
+                updateData.header = header.data;
                 updateData.headerVersion = header.expectedVersion + 1;
                 headerUpdate = {
                     value: header.data,
@@ -171,7 +171,7 @@ export function artifactUpdateHandler(userId: string, socket: Socket) {
             }
 
             if (body) {
-                updateData.body = privacyKit.decodeBase64(body.data);
+                updateData.body = body.data;
                 updateData.bodyVersion = body.expectedVersion + 1;
                 bodyUpdate = {
                     value: body.data,
@@ -204,14 +204,14 @@ export function artifactUpdateHandler(userId: string, socket: Socket) {
                 if (header && current) {
                     response.header = {
                         currentVersion: current.headerVersion,
-                        currentData: privacyKit.encodeBase64(current.header)
+                        currentData: current.header
                     };
                 }
                 
                 if (body && current) {
                     response.body = {
                         currentVersion: current.bodyVersion,
-                        currentData: privacyKit.encodeBase64(current.body)
+                        currentData: current.body
                     };
                 }
                 
@@ -293,9 +293,9 @@ export function artifactUpdateHandler(userId: string, socket: Socket) {
                     result: 'success',
                     artifact: {
                         id: existingArtifact.id,
-                        header: privacyKit.encodeBase64(existingArtifact.header),
+                        header: existingArtifact.header,
                         headerVersion: existingArtifact.headerVersion,
-                        body: privacyKit.encodeBase64(existingArtifact.body),
+                        body: existingArtifact.body,
                         bodyVersion: existingArtifact.bodyVersion,
                         seq: existingArtifact.seq,
                         createdAt: existingArtifact.createdAt.getTime(),
@@ -333,9 +333,9 @@ export function artifactUpdateHandler(userId: string, socket: Socket) {
                 result: 'success',
                 artifact: {
                     id: artifact.id,
-                    header: privacyKit.encodeBase64(artifact.header),
+                    header: artifact.header,
                     headerVersion: artifact.headerVersion,
-                    body: privacyKit.encodeBase64(artifact.body),
+                    body: artifact.body,
                     bodyVersion: artifact.bodyVersion,
                     seq: artifact.seq,
                     createdAt: artifact.createdAt.getTime(),

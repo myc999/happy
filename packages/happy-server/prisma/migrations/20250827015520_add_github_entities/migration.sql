@@ -5,7 +5,7 @@ ALTER TABLE "Account" ADD COLUMN     "githubUserId" TEXT;
 CREATE TABLE "GithubUser" (
     "id" TEXT NOT NULL,
     "profile" JSONB NOT NULL,
-    "token" BYTEA,
+    "token" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 

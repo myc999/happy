@@ -31,7 +31,7 @@ export async function kvGet(
 
     return {
         key: result.key,
-        value: privacyKit.encodeBase64(result.value),
+        value: result.value,
         version: result.version
     };
 }

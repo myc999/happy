@@ -1,2 +1,2 @@
 -- AlterTable
-ALTER TABLE "Session" ADD COLUMN     "dataEncryptionKey" BYTEA;
+ALTER TABLE "Session" ADD COLUMN     "dataEncryptionKey" TEXT;

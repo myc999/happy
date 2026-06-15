@@ -112,6 +112,10 @@ async function serve() {
     // Ensure DB_PROVIDER is set for db.ts
     process.env.DB_PROVIDER = process.env.DB_PROVIDER || "pglite";
     process.env.PGLITE_DIR = process.env.PGLITE_DIR || pgliteDir;
+    // Prisma validates DATABASE_URL from schema even with driver adapters; set a dummy if not present
+    if (!process.env.DATABASE_URL) {
+        process.env.DATABASE_URL = "postgresql://pglite:pglite@localhost/pglite";
+    }
 
     const masterSecret = process.env.HANDY_MASTER_SECRET;
     if (!masterSecret) {
@@ -166,10 +170,15 @@ function findStaticDir(): string | undefined {
 const invokedFile = process.argv[1] ? path.resolve(process.argv[1]) : "";
 const isDirectInvocation =
     invokedFile.endsWith("/standalone.ts") ||
+    invokedFile.endsWith("\\standalone.ts") ||
     invokedFile.endsWith("/standalone.js") ||
+    invokedFile.endsWith("\\standalone.js") ||
     invokedFile.endsWith("/standalone.mjs") ||
+    invokedFile.endsWith("\\standalone.mjs") ||
     invokedFile.endsWith("/standalone.cjs") ||
-    invokedFile.endsWith("/happy-server");
+    invokedFile.endsWith("\\standalone.cjs") ||
+    invokedFile.endsWith("/happy-server") ||
+    invokedFile.endsWith("\\happy-server");
 
 if (isDirectInvocation) {
     const command = process.argv[2];

@@ -10,16 +10,37 @@ import { ItemList } from '@/components/ItemList';
 import { ItemGroup } from '@/components/ItemGroup';
 import { Item } from '@/components/Item';
 import { t } from '@/text';
+import { useAuth } from '@/auth/AuthContext';
+import { authGetToken } from '@/auth/authGetToken';
+import { encodeBase64 } from '@/encryption/base64';
+import { getRandomBytesAsync } from 'expo-crypto';
 
 export default function TerminalConnectScreen() {
     const router = useRouter();
+    const auth = useAuth();
     const [publicKey, setPublicKey] = useState<string | null>(null);
     const [hashProcessed, setHashProcessed] = useState(false);
+    const [creatingAccount, setCreatingAccount] = useState(false);
     const { processAuthUrl, isLoading } = useConnectTerminal({
         onSuccess: () => {
             router.back();
         }
     });
+
+    const createAccount = async () => {
+        setCreatingAccount(true);
+        try {
+            const secret = await getRandomBytesAsync(32);
+            const token = await authGetToken(secret);
+            if (token && secret) {
+                await auth.login(token, encodeBase64(secret, 'base64url'));
+            }
+        } catch (error) {
+            console.error('Error creating account', error);
+        } finally {
+            setCreatingAccount(false);
+        }
+    };
 
     // Extract key from hash on web platform
     useEffect(() => {
@@ -142,6 +163,41 @@ export default function TerminalConnectScreen() {
                         }}>
                             {t('terminal.invalidConnectionLinkDescription')}
                         </Text>
+                    </View>
+                </ItemGroup>
+            </ItemList>
+        );
+    }
+
+    // Show create account screen if not authenticated
+    if (!auth.isAuthenticated) {
+        return (
+            <ItemList>
+                <ItemGroup>
+                    <View style={{
+                        alignItems: 'center',
+                        paddingVertical: 32,
+                        paddingHorizontal: 16
+                    }}>
+                        <Ionicons
+                            name="person-circle-outline"
+                            size={64}
+                            color="#007AFF"
+                            style={{ marginBottom: 16 }}
+                        />
+                        <Text style={{ ...Typography.default('semiBold'), fontSize: 20, textAlign: 'center', marginBottom: 12 }}>
+                            {t('welcome.title')}
+                        </Text>
+                        <Text style={{ ...Typography.default(), fontSize: 14, color: '#666', textAlign: 'center', lineHeight: 20, marginBottom: 24 }}>
+                            {t('terminal.createAccountToConnect')}
+                        </Text>
+                        <RoundButton
+                            title={creatingAccount ? t('common.loading') : t('welcome.createAccount')}
+                            action={createAccount}
+                            size="large"
+                            disabled={creatingAccount}
+                            loading={creatingAccount}
+                        />
                     </View>
                 </ItemGroup>
             </ItemList>

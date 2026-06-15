@@ -49,7 +49,7 @@ export async function kvList(
             .filter(r => r.value !== null)  // Extra safety check
             .map(r => ({
                 key: r.key,
-                value: privacyKit.encodeBase64(r.value!),
+                value: r.value,
                 version: r.version
             }))
     };

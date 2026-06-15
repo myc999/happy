@@ -70,8 +70,13 @@ docs/competition/opencode/traces/
 .cdp-scripts/
 happy-workspaces/
 
+# Webapp build output
+packages/happy-server/webapp/
+
 # Docker build artifacts
 happy-server.tar.gz
+happy-server-build.tar.gz
+tmp-build/
 
 # local HAPPY_HOME_DIR for self-host testing
 .happy-fully-local/

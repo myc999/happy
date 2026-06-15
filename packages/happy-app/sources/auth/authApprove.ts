@@ -11,8 +11,8 @@ interface AuthRequestStatus {
 
 export async function authApprove(token: string, publicKey: Uint8Array, answerV1: Uint8Array, answerV2: Uint8Array) {
     const API_ENDPOINT = getServerUrl();
-    const publicKeyBase64 = encodeBase64(publicKey);
-    
+    const publicKeyBase64 = encodeBase64(publicKey, 'base64url');
+
     // First, check the auth request status
     const statusResponse = await axios.get<AuthRequestStatus>(
         `${API_ENDPOINT}/v1/auth/request/status`,
@@ -25,14 +25,12 @@ export async function authApprove(token: string, publicKey: Uint8Array, answerV1
             }
         }
     );
-    
+
     const { status, supportsV2 } = statusResponse.data;
-    
+
     // Handle different status cases
     if (status === 'not_found') {
-        // Already authorized, no need to approve again
-        console.log('Auth request already authorized or not found');
-        return;
+        throw new Error('Auth request not found or expired. Please try again.');
     }
     
     if (status === 'authorized') {

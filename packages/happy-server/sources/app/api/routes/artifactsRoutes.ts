@@ -48,9 +48,9 @@ export function artifactsRoutes(app: Fastify) {
 
             return reply.send(artifacts.map(a => ({
                 id: a.id,
-                header: privacyKit.encodeBase64(a.header),
+                header: a.header,
                 headerVersion: a.headerVersion,
-                dataEncryptionKey: privacyKit.encodeBase64(a.dataEncryptionKey),
+                dataEncryptionKey: a.dataEncryptionKey,
                 seq: a.seq,
                 createdAt: a.createdAt.getTime(),
                 updatedAt: a.updatedAt.getTime()
@@ -106,11 +106,11 @@ export function artifactsRoutes(app: Fastify) {
 
             return reply.send({
                 id: artifact.id,
-                header: privacyKit.encodeBase64(artifact.header),
+                header: artifact.header,
                 headerVersion: artifact.headerVersion,
-                body: privacyKit.encodeBase64(artifact.body),
+                body: artifact.body,
                 bodyVersion: artifact.bodyVersion,
-                dataEncryptionKey: privacyKit.encodeBase64(artifact.dataEncryptionKey),
+                dataEncryptionKey: artifact.dataEncryptionKey,
                 seq: artifact.seq,
                 createdAt: artifact.createdAt.getTime(),
                 updatedAt: artifact.updatedAt.getTime()
@@ -173,11 +173,11 @@ export function artifactsRoutes(app: Fastify) {
                 log({ module: 'api', artifactId: id, userId }, 'Found existing artifact');
                 return reply.send({
                     id: existingArtifact.id,
-                    header: privacyKit.encodeBase64(existingArtifact.header),
+                    header: existingArtifact.header,
                     headerVersion: existingArtifact.headerVersion,
-                    body: privacyKit.encodeBase64(existingArtifact.body),
+                    body: existingArtifact.body,
                     bodyVersion: existingArtifact.bodyVersion,
-                    dataEncryptionKey: privacyKit.encodeBase64(existingArtifact.dataEncryptionKey),
+                    dataEncryptionKey: existingArtifact.dataEncryptionKey,
                     seq: existingArtifact.seq,
                     createdAt: existingArtifact.createdAt.getTime(),
                     updatedAt: existingArtifact.updatedAt.getTime()
@@ -190,11 +190,11 @@ export function artifactsRoutes(app: Fastify) {
                 data: {
                     id,
                     accountId: userId,
-                    header: privacyKit.decodeBase64(header),
+                    header: header,
                     headerVersion: 1,
-                    body: privacyKit.decodeBase64(body),
+                    body: body,
                     bodyVersion: 1,
-                    dataEncryptionKey: privacyKit.decodeBase64(dataEncryptionKey),
+                    dataEncryptionKey: dataEncryptionKey,
                     seq: 0
                 }
             });
@@ -210,11 +210,11 @@ export function artifactsRoutes(app: Fastify) {
 
             return reply.send({
                 id: artifact.id,
-                header: privacyKit.encodeBase64(artifact.header),
+                header: artifact.header,
                 headerVersion: artifact.headerVersion,
-                body: privacyKit.encodeBase64(artifact.body),
+                body: artifact.body,
                 bodyVersion: artifact.bodyVersion,
-                dataEncryptionKey: privacyKit.encodeBase64(artifact.dataEncryptionKey),
+                dataEncryptionKey: artifact.dataEncryptionKey,
                 seq: artifact.seq,
                 createdAt: artifact.createdAt.getTime(),
                 updatedAt: artifact.updatedAt.getTime()
@@ -292,11 +292,11 @@ export function artifactsRoutes(app: Fastify) {
                     error: 'version-mismatch',
                     ...(headerMismatch && {
                         currentHeaderVersion: currentArtifact.headerVersion,
-                        currentHeader: privacyKit.encodeBase64(currentArtifact.header)
+                        currentHeader: currentArtifact.header
                     }),
                     ...(bodyMismatch && {
                         currentBodyVersion: currentArtifact.bodyVersion,
-                        currentBody: privacyKit.encodeBase64(currentArtifact.body)
+                        currentBody: currentArtifact.body
                     })
                 });
             }
@@ -310,7 +310,7 @@ export function artifactsRoutes(app: Fastify) {
             let bodyUpdate: { value: string; version: number } | undefined;
 
             if (header !== undefined && expectedHeaderVersion !== undefined) {
-                updateData.header = privacyKit.decodeBase64(header);
+                updateData.header = header;
                 updateData.headerVersion = expectedHeaderVersion + 1;
                 headerUpdate = {
                     value: header,
@@ -319,7 +319,7 @@ export function artifactsRoutes(app: Fastify) {
             }
 
             if (body !== undefined && expectedBodyVersion !== undefined) {
-                updateData.body = privacyKit.decodeBase64(body);
+                updateData.body = body;
                 updateData.bodyVersion = expectedBodyVersion + 1;
                 bodyUpdate = {
                     value: body,
