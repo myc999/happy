@@ -13,6 +13,8 @@ import { render } from 'ink';
 import React from 'react';
 import { randomUUID } from 'node:crypto';
 import { logger } from './logger';
+import chalk from 'chalk';
+import { formatSecretKeyForBackup } from '@/utils/backupKey';
 
 export async function doAuth(): Promise<Credentials | null> {
     console.clear();
@@ -179,6 +181,7 @@ async function waitForAuthentication(keypair: tweetnacl.BoxKeyPair): Promise<Cre
                             }
                             await writeCredentialsLegacy(credentials);
                             console.log('\n\n✓ Authentication successful\n');
+                            printSecretKey(decrypted);
                             return {
                                 encryption: {
                                     type: 'legacy',
@@ -287,4 +290,19 @@ export async function authAndSetupMachineIfNeeded(): Promise<{
     logger.debug(`[AUTH] Machine ID: ${settings.machineId}`);
 
     return { credentials, machineId: settings.machineId! };
+}
+function printSecretKey(secret: Uint8Array): void {
+    const formatted = formatSecretKeyForBackup(secret);
+    console.log(chalk.yellow('┌─────────────────────────────────────────────────────┐'));
+    console.log(chalk.yellow('│') + chalk.bold('  🔑 Your Secret Key — Save this to log in anywhere  ') + chalk.yellow('│'));
+    console.log(chalk.yellow('├─────────────────────────────────────────────────────┤'));
+    console.log(chalk.yellow('│') + '                                                     ' + chalk.yellow('│'));
+    console.log(chalk.yellow('│  ') + chalk.cyan.bold(formatted.padEnd(51)) + chalk.yellow('│'));
+    console.log(chalk.yellow('│') + '                                                     ' + chalk.yellow('│'));
+    console.log(chalk.yellow('├─────────────────────────────────────────────────────┤'));
+    console.log(chalk.yellow('│') + chalk.gray('  To log in from any browser:                        ') + chalk.yellow('│'));
+    console.log(chalk.yellow('│') + chalk.gray(`  ${configuration.webappUrl ?? configuration.serverUrl}`) + ' '.repeat(Math.max(0, 51 - (configuration.webappUrl ?? configuration.serverUrl ?? '').length)) + chalk.yellow('│'));
+    console.log(chalk.yellow('│') + chalk.gray('  → "Login with Secret Key"                          ') + chalk.yellow('│'));
+    console.log(chalk.yellow('└─────────────────────────────────────────────────────┘'));
+    console.log();
 }

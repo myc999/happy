@@ -441,7 +441,7 @@ Conversation history is preserved on the server, but in-flight tool calls are in
     return;
   } else if (subcommand === 'logout') {
     // Keep for backward compatibility - redirect to auth logout
-    console.log(chalk.yellow('Note: "aif4 logout" is deprecated. Use "aif4 auth logout" instead.\n'));
+    console.log(chalk.yellow('Note: "helmcode logout" is deprecated. Use "helmcode auth logout" instead.\n'));
     try {
       await handleAuthCommand(['logout']);
     } catch (error) {
@@ -558,20 +558,20 @@ Conversation history is preserved on the server, but in-flight tool calls are in
       }
     } else {
       console.log(`
-${chalk.bold('aif4 daemon')} - Daemon management
+${chalk.bold('helmcode daemon')} - Daemon management
 
 ${chalk.bold('Usage:')}
-  aif4 daemon start              Start the daemon (detached)
-  aif4 daemon stop               Stop the daemon (sessions stay alive)
-  aif4 daemon status             Show daemon status
-  aif4 daemon list               List active sessions
+  helmcode daemon start              Start the daemon (detached)
+  helmcode daemon stop               Stop the daemon (sessions stay alive)
+  helmcode daemon status             Show daemon status
+  helmcode daemon list               List active sessions
 
-  If you want to kill all aif4 related processes run
-  ${chalk.cyan('aif4 doctor clean')}
+  If you want to kill all helmcode related processes run
+  ${chalk.cyan('helmcode doctor clean')}
 
 ${chalk.bold('Note:')} The daemon runs in the background and manages Claude sessions.
 
-${chalk.bold('To clean up runaway processes:')} Use ${chalk.cyan('aif4 doctor clean')}
+${chalk.bold('To clean up runaway processes:')} Use ${chalk.cyan('helmcode doctor clean')}
 `)
     }
     return;
@@ -604,7 +604,7 @@ ${chalk.bold('To clean up runaway processes:')} Use ${chalk.cyan('aif4 doctor cl
         showVersion = true
         // Also pass through to claude (will show after our version)
         unknownArgs.push(arg)
-      } else if (arg === '--aif4-starting-mode') {
+      } else if (arg === '--helmcode-starting-mode') {
         options.startingMode = z.enum(['local', 'remote']).parse(args[++i])
       } else if (arg === '--yolo') {
         // Shortcut for --dangerously-skip-permissions
@@ -671,43 +671,43 @@ ${chalk.bold('To clean up runaway processes:')} Use ${chalk.cyan('aif4 doctor cl
     // Show help
     if (showHelp) {
       console.log(`
-${chalk.bold('aif4')} - Claude Code On the Go
+${chalk.bold("helmcode")} - Claude Code On the Go
 
 ${chalk.bold('Usage:')}
-  aif4 [options]         Start Claude with mobile control
-  aif4 auth              Manage authentication
-  aif4 resume            Resume a previous AIF4 session by AIF4 session ID
-  aif4 codex             Start Codex mode
-  aif4 gemini            Start Gemini mode (ACP)
-  aif4 acp               Start a generic ACP-compatible agent
-  aif4 connect           Connect AI vendor API keys
-  aif4 sandbox           Configure and manage OS-level sandboxing
-  aif4 notify            Send push notification
-  aif4 daemon            Manage background service that allows
+  helmcode [options]         Start Claude with mobile control
+  helmcode auth              Manage authentication
+  helmcode resume            Resume a previous HelmCode session by HelmCode session ID
+  helmcode codex             Start Codex mode
+  helmcode gemini            Start Gemini mode (ACP)
+  helmcode acp               Start a generic ACP-compatible agent
+  helmcode connect           Connect AI vendor API keys
+  helmcode sandbox           Configure and manage OS-level sandboxing
+  helmcode notify            Send push notification
+  helmcode daemon            Manage background service that allows
                             to spawn new sessions away from your computer
-  aif4 doctor            System diagnostics & troubleshooting
+  helmcode doctor            System diagnostics & troubleshooting
 
 ${chalk.bold('Examples:')}
-  aif4                    Start session
-  aif4 resume cmmij8      Resume a previous session by AIF4 session ID
-  aif4 --yolo             Start with bypassing permissions
-                            aif4 sugar for --dangerously-skip-permissions
-  aif4 --chrome           Enable Chrome browser access for this session
-  aif4 --no-chrome        Disable Chrome even if default is on
-  aif4 --no-sandbox       Disable AIF4 sandbox for this session
-  aif4 --js-runtime bun   Use bun instead of node to spawn Claude Code
-  aif4 --claude-env ANTHROPIC_BASE_URL=http://127.0.0.1:3456
+  helmcode                 Start session
+  helmcode resume cmmij8      Resume a previous session by HelmCode session ID
+  helmcode --yolo             Start with bypassing permissions
+                            helmcode sugar for --dangerously-skip-permissions
+  helmcode --chrome           Enable Chrome browser access for this session
+  helmcode --no-chrome        Disable Chrome even if default is on
+  helmcode --no-sandbox       Disable HelmCode sandbox for this session
+  helmcode --js-runtime bun   Use bun instead of node to spawn Claude Code
+  helmcode --claude-env ANTHROPIC_BASE_URL=http://127.0.0.1:3456
                            Use a custom API endpoint (e.g., claude-code-router)
-  aif4 acp gemini         Start Gemini via generic ACP runner
-  aif4 acp -- opencode --acp
+  helmcode acp gemini         Start Gemini via generic ACP runner
+  helmcode acp -- opencode --acp
                            Start a custom ACP command
-  aif4 acp opencode --verbose
+  helmcode acp opencode --verbose
                            Print raw ACP backend/envelope events
-  aif4 auth login --force Authenticate
-  aif4 doctor             Run diagnostics
+  helmcode auth login --force Authenticate
+  helmcode doctor             Run diagnostics
 
 ${chalk.bold('AIF4 supports ALL Claude options!')}
-  Use any claude flag with aif4 as you would with claude. Our favorite:
+  Use any claude flag with helmcode as you would with claude. Our favorite:
 
   happy --resume
 
@@ -729,7 +729,7 @@ ${chalk.bold.cyan('Claude Code Options (from `claude --help`):')}
 
     // Show version
     if (showVersion) {
-      console.log(`aif4 version: ${packageJson.version}`)
+      console.log(`helmcode version: ${packageJson.version}`)
       // Don't exit - continue to pass --version to Claude Code
     }
 
@@ -779,34 +779,34 @@ async function handleNotifyCommand(args: string[]): Promise<void> {
 
   if (showHelp) {
     console.log(`
-${chalk.bold('aif4 notify')} - Send notification
+${chalk.bold('helmcode notify')} - Send notification
 
 ${chalk.bold('Usage:')}
-  aif4 notify -p <message> [-t <title>]    Send notification with custom message and optional title
-  aif4 notify -h, --help                   Show this help
+  helmcode notify -p <message> [-t <title>]    Send notification with custom message and optional title
+  helmcode notify -h, --help                   Show this help
 
 ${chalk.bold('Options:')}
   -p <message>    Notification message (required)
   -t <title>      Notification title (optional, defaults to "AIF4")
 
 ${chalk.bold('Examples:')}
-  aif4 notify -p "Deployment complete!"
-  aif4 notify -p "System update complete" -t "Server Status"
-  aif4 notify -t "Alert" -p "Database connection restored"
+  helmcode notify -p "Deployment complete!"
+  helmcode notify -p "System update complete" -t "Server Status"
+  helmcode notify -t "Alert" -p "Database connection restored"
 `)
     return
   }
 
   if (!message) {
     console.error(chalk.red('Error: Message is required. Use -p "your message" to specify the notification text.'))
-    console.log(chalk.gray('Run "aif4 notify --help" for usage information.'))
+    console.log(chalk.gray('Run "helmcode notify --help" for usage information.'))
     process.exit(1)
   }
 
   // Load credentials
   let credentials = await readCredentials()
   if (!credentials) {
-    console.error(chalk.red('Error: Not authenticated. Please run "aif4 auth login" first.'))
+    console.error(chalk.red('Error: Not authenticated. Please run "helmcode auth login" first.'))
     process.exit(1)
   }
 

@@ -94,7 +94,7 @@ export async function runDoctorDaemon(): Promise<void> {
         console.log(chalk.red('❌ Error checking daemon status'));
     }
 
-    console.log(chalk.gray('\nRun `aif4 doctor` for full diagnostics.\n'));
+    console.log(chalk.gray('\nRun `helmcode doctor` for full diagnostics.\n'));
 }
 
 /**
@@ -144,10 +144,10 @@ export async function runDoctorCommand(): Promise<void> {
 
             if (allProcesses.length > 1) {
                 console.log(chalk.bold('\n💡 Process Management'));
-                console.log(chalk.gray('To clean up runaway processes: aif4 doctor clean'));
+                console.log(chalk.gray('To clean up runaway processes: helmcode doctor clean'));
             }
         } else {
-            console.log(chalk.red('❌ No aif4 processes found'));
+            console.log(chalk.red('❌ No helmcode processes found'));
         }
     } catch (error) {
         console.log(chalk.red('❌ Error listing processes'));
@@ -192,7 +192,7 @@ export async function runDoctorCommand(): Promise<void> {
     // Daemon spawn diagnostics
     console.log(chalk.bold('\n🔧 Daemon Spawn Diagnostics'));
     const projectRoot = projectPath();
-    const wrapperPath = join(projectRoot, 'bin', 'aif4.mjs');
+    const wrapperPath = join(projectRoot, 'bin', 'helmcode.mjs');
     const cliEntrypoint = join(projectRoot, 'dist', 'index.mjs');
     console.log(`Project Root: ${chalk.blue(projectRoot)}`);
     console.log(`Wrapper Script: ${chalk.blue(wrapperPath)}`);

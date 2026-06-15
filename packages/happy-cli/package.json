@@ -1,5 +1,5 @@
 {
-  "name": "@aif4/aif4",
+  "name": "@helmcode/helmcode",
   "version": "1.1.10-beta.13",
   "description": "Mobile and Web client for Claude Code and Codex",
   "author": "myc999",
@@ -12,8 +12,8 @@
     "url": "git+https://github.com/myc999/happy.git"
   },
   "bin": {
-    "aif4": "bin/aif4",
-    "aif4-mcp": "bin/aif4-mcp"
+    "helmcode": "bin/helmcode",
+    "helmcode-mcp": "bin/helmcode-mcp"
   },
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",

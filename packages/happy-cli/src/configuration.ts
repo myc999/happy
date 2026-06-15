@@ -39,7 +39,7 @@ class Configuration {
       const expandedPath = process.env.AIF4_HOME_DIR.replace(/^~/, homedir())
       this.happyHomeDir = expandedPath
     } else {
-      this.happyHomeDir = join(homedir(), '.aif4')
+      this.happyHomeDir = join(homedir(), '.helmcode')
     }
 
     this.logsDir = join(this.happyHomeDir, 'logs')
