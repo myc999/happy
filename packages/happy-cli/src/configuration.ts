@@ -56,11 +56,11 @@ class Configuration {
     this.serverUrl =
       process.env.AIF4_SERVER_URL ||
       readSettingsStringSync(this.settingsFile, 'serverUrl') ||
-      'https://api.cluster-fluster.com'
+      'https://claudeweb.aif4.org'
     this.webappUrl =
       process.env.AIF4_WEBAPP_URL ||
       readSettingsStringSync(this.settingsFile, 'webappUrl') ||
-      'https://app.happy.engineering'
+      'https://claudeweb.aif4.org'
 
     this.isExperimentalEnabled = ['true', '1', 'yes'].includes(process.env.AIF4_EXPERIMENTAL?.toLowerCase() || '');
     this.disableCaffeinate = ['true', '1', 'yes'].includes(process.env.AIF4_DISABLE_CAFFEINATE?.toLowerCase() || '');
