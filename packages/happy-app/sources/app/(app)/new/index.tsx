@@ -667,6 +667,10 @@ function NewSessionScreen() {
         setSelectedPath(pathItems[0]?.label ?? '~');
     }, [selectedMachineId, pathItems, selectedPath, setSelectedPath]);
 
+    const resolvedSelectedPath = React.useMemo(() => {
+        return normalizePathForComparison(selectedPath, selectedHomeDir);
+    }, [selectedHomeDir, selectedPath]);
+
     // Sessions in the current path that can be resumed (have claudeSessionId)
     const resumableSessions = React.useMemo<PickerItem[]>(() => {
         if (!sessions || !resolvedSelectedPath) return [];
@@ -684,10 +688,6 @@ function NewSessionScreen() {
                 };
             });
     }, [sessions, resolvedSelectedPath]);
-
-    const resolvedSelectedPath = React.useMemo(() => {
-        return normalizePathForComparison(selectedPath, selectedHomeDir);
-    }, [selectedHomeDir, selectedPath]);
 
     const [debouncedResolvedSelectedPath, setDebouncedResolvedSelectedPath] = React.useState<string | null>(resolvedSelectedPath);
 
