@@ -48,6 +48,16 @@ function main() {
         process.exit(1);
     }
 
+    // Patch viewport meta for mobile browser (toolbar clearance + keyboard resize)
+    const htmlPath = path.join(APP_DIST, 'index.html');
+    let html = fs.readFileSync(htmlPath, 'utf8');
+    html = html.replace(
+        /(<meta name="viewport" content=")([^"]*?)(")/,
+        '$1$2, viewport-fit=cover, interactive-widget=resizes-content$3'
+    );
+    fs.writeFileSync(htmlPath, html);
+    console.log(`  ✓ Patched viewport meta in index.html`);
+
     console.log(`\n→ Copying webapp into ${outDir}`);
     rmrf(outDir);
     fs.mkdirSync(path.dirname(outDir), { recursive: true });

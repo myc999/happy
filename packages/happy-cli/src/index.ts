@@ -604,7 +604,7 @@ ${chalk.bold('To clean up runaway processes:')} Use ${chalk.cyan('helmcode docto
         showVersion = true
         // Also pass through to claude (will show after our version)
         unknownArgs.push(arg)
-      } else if (arg === '--helmcode-starting-mode') {
+      } else if (arg === '--helmcode-starting-mode' || arg === '--happy-starting-mode') {
         options.startingMode = z.enum(['local', 'remote']).parse(args[++i])
       } else if (arg === '--yolo') {
         // Shortcut for --dangerously-skip-permissions

@@ -39,7 +39,7 @@ import { isMachineOnline } from '@/utils/machineUtils';
 import { machineSpawnNewSession } from '@/sync/ops';
 import { createWorktree, listWorktrees } from '@/utils/worktree';
 import { resolveAbsolutePath } from '@/utils/pathUtils';
-import { formatPathRelativeToHome, formatLastSeen } from '@/utils/sessionUtils';
+import { formatPathRelativeToHome, formatLastSeen, getSessionName } from '@/utils/sessionUtils';
 import { useNavigateToSession } from '@/hooks/useNavigateToSession';
 import { useNewSessionDraft } from '@/hooks/useNewSessionDraft';
 import { useShallow } from 'zustand/react/shallow';
@@ -78,7 +78,7 @@ const ALL_AGENTS: { key: AgentKey; label: string }[] = [
 
 type PickerItem = { key: string; label: string; subtitle?: string; dimmed?: boolean };
 
-type PickerType = 'machine' | 'path' | 'worktree' | 'agent' | 'model' | 'effort' | 'permission';
+type PickerType = 'machine' | 'path' | 'worktree' | 'agent' | 'model' | 'effort' | 'permission' | 'resume';
 
 type PermissionStyle = { color: string; icon: 'play-forward' | 'pause' };
 
@@ -594,6 +594,13 @@ function NewSessionScreen() {
         draft.setWorktreeKey(worktreeKey === '__none__' || worktreeKey === '__new__' ? null : worktreeKey);
     }, [worktreeKey]);
 
+    const [resumeSessionId, setResumeSessionId] = React.useState<string | null>(null);
+
+    // Clear resume selection when path changes
+    React.useEffect(() => {
+        setResumeSessionId(null);
+    }, [selectedPath]);
+
     // Local-only UI state (not persisted)
     const [permissionIndex, setPermissionIndex] = React.useState(0);
     const [modelIndex, setModelIndex] = React.useState(0);
@@ -659,6 +666,24 @@ function NewSessionScreen() {
 
         setSelectedPath(pathItems[0]?.label ?? '~');
     }, [selectedMachineId, pathItems, selectedPath, setSelectedPath]);
+
+    // Sessions in the current path that can be resumed (have claudeSessionId)
+    const resumableSessions = React.useMemo<PickerItem[]>(() => {
+        if (!sessions || !resolvedSelectedPath) return [];
+        return (sessions as Session[])
+            .filter(s => typeof s !== 'string'
+                && s.metadata?.path === resolvedSelectedPath
+                && s.metadata?.claudeSessionId)
+            .sort((a, b) => (b as Session).updatedAt - (a as Session).updatedAt)
+            .map(s => {
+                const session = s as Session;
+                return {
+                    key: session.metadata!.claudeSessionId!,
+                    label: getSessionName(session),
+                    subtitle: formatLastSeen(session.updatedAt, false),
+                };
+            });
+    }, [sessions, resolvedSelectedPath]);
 
     const resolvedSelectedPath = React.useMemo(() => {
         return normalizePathForComparison(selectedPath, selectedHomeDir);
@@ -836,6 +861,8 @@ function NewSessionScreen() {
                 return { title: 'Effort', items: getModePickerItems(effortLevels), selectedKey: currentEffort?.key ?? null, searchPlaceholder: 'search efforts...' };
             case 'permission':
                 return { title: 'Permissions', items: getModePickerItems(permissionModes), selectedKey: currentPermission?.key ?? null, searchPlaceholder: 'search permissions...' };
+            case 'resume':
+                return { title: '继续历史对话', items: resumableSessions, selectedKey: resumeSessionId, searchPlaceholder: '搜索历史对话...' };
             default:
                 return null;
         }
@@ -849,6 +876,8 @@ function NewSessionScreen() {
         machineItems,
         modelModes,
         permissionModes,
+        resumableSessions,
+        resumeSessionId,
         selectedAgent,
         selectedMachineId,
         worktreeKey,
@@ -891,6 +920,9 @@ function NewSessionScreen() {
                 }
                 break;
             }
+            case 'resume':
+                setResumeSessionId(key);
+                break;
         }
         setActivePicker(null);
     }, [
@@ -941,6 +973,7 @@ function NewSessionScreen() {
                 directory: spawnDirectory,
                 approvedNewDirectoryCreation,
                 agent: selectedAgent,
+                resumeClaudeSessionId: resumeSessionId ?? undefined,
             });
 
             switch (result.type) {
@@ -1218,6 +1251,36 @@ function NewSessionScreen() {
                                         <Ionicons name="chevron-down" size={13} color={theme.colors.textSecondary} />
                                     </Pressable>
                                     {renderActivePickerPopover('worktree')}
+                                </>
+                            )}
+
+                            {agent.key === 'claude' && (
+                                <>
+                                    <View style={[styles.configRow, { opacity: resumableSessions.length === 0 ? 0.4 : 1 }]}>
+                                        <Pressable
+                                            style={(p) => [styles.configInlineField, { flex: 1 }, p.pressed && styles.configRowPressed]}
+                                            onPress={() => resumableSessions.length > 0 && togglePicker('resume')}
+                                            disabled={resumableSessions.length === 0}
+                                        >
+                                            <Ionicons name="git-branch-outline" size={15} color={theme.colors.textSecondary} />
+                                            <Text style={[styles.configLabel, styles.configValueText]} numberOfLines={1}>
+                                                {resumeSessionId
+                                                    ? (resumableSessions.find(s => s.key === resumeSessionId)?.label ?? '继续历史对话')
+                                                    : resumableSessions.length === 0 ? '无历史对话' : '新对话'}
+                                            </Text>
+                                            <Ionicons name="chevron-down" size={13} color={theme.colors.textSecondary} />
+                                        </Pressable>
+                                        {resumeSessionId && (
+                                            <Pressable
+                                                onPress={() => setResumeSessionId(null)}
+                                                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                                                style={(p) => [{ paddingHorizontal: 8 }, p.pressed && styles.configRowPressed]}
+                                            >
+                                                <Ionicons name="close-circle-outline" size={16} color={theme.colors.textSecondary} />
+                                            </Pressable>
+                                        )}
+                                    </View>
+                                    {renderActivePickerPopover('resume')}
                                 </>
                             )}
                         </View>
