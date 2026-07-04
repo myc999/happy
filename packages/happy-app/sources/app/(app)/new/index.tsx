@@ -597,23 +597,6 @@ function NewSessionScreen() {
     const [resumeSessionId, setResumeSessionId] = React.useState<string | null>(null);
     const [resumableSessions, setResumableSessions] = React.useState<PickerItem[]>([]);
 
-    // Load Claude Code sessions from machine filesystem when machine/path changes
-    React.useEffect(() => {
-        setResumeSessionId(null);
-        setResumableSessions([]);
-        if (!selectedMachineId || !resolvedSelectedPath) return;
-        let cancelled = false;
-        listMachineClaudeSessions(selectedMachineId, resolvedSelectedPath).then(sessions => {
-            if (cancelled) return;
-            setResumableSessions(sessions.map(s => ({
-                key: s.sessionId,
-                label: s.title,
-                subtitle: formatLastSeen(s.updatedAt, false),
-            })));
-        });
-        return () => { cancelled = true; };
-    }, [selectedMachineId, resolvedSelectedPath]);
-
     // Local-only UI state (not persisted)
     const [permissionIndex, setPermissionIndex] = React.useState(0);
     const [modelIndex, setModelIndex] = React.useState(0);
@@ -683,6 +666,23 @@ function NewSessionScreen() {
     const resolvedSelectedPath = React.useMemo(() => {
         return normalizePathForComparison(selectedPath, selectedHomeDir);
     }, [selectedHomeDir, selectedPath]);
+
+    // Load Claude Code sessions from machine filesystem when machine/path changes
+    React.useEffect(() => {
+        setResumeSessionId(null);
+        setResumableSessions([]);
+        if (!selectedMachineId || !resolvedSelectedPath) return;
+        let cancelled = false;
+        listMachineClaudeSessions(selectedMachineId, resolvedSelectedPath).then(sessions => {
+            if (cancelled) return;
+            setResumableSessions(sessions.map(s => ({
+                key: s.sessionId,
+                label: s.title,
+                subtitle: formatLastSeen(s.updatedAt, false),
+            })));
+        });
+        return () => { cancelled = true; };
+    }, [selectedMachineId, resolvedSelectedPath]);
 
     const [debouncedResolvedSelectedPath, setDebouncedResolvedSelectedPath] = React.useState<string | null>(resolvedSelectedPath);
 
