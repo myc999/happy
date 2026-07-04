@@ -268,6 +268,20 @@ export async function claudeForkSession(options: ClaudeForkSessionOptions): Prom
     }
 }
 
+export type ClaudeLocalSession = { sessionId: string; title: string; updatedAt: number };
+
+export async function listMachineClaudeSessions(machineId: string, directory: string): Promise<ClaudeLocalSession[]> {
+    try {
+        return await apiSocket.machineRPC<ClaudeLocalSession[], { directory: string }>(
+            machineId,
+            'list-claude-sessions',
+            { directory },
+        );
+    } catch {
+        return [];
+    }
+}
+
 /**
  * Read the on-disk Claude JSONL on the daemon machine and return user-text
  * messages with their underlying claudeUuid + timestamp. Disk is the

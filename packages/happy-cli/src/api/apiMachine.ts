@@ -315,6 +315,42 @@ export class ApiMachineClient {
             }
         });
 
+        // List Claude Code sessions for a directory (reads ~/.claude/projects/<path>/)
+        this.rpcHandlerManager.registerHandler('list-claude-sessions', async (params: any) => {
+            const { directory } = params || {};
+            if (!directory) throw new Error('directory is required');
+            const { readdir, stat, readFile } = await import('node:fs/promises');
+            const projectDir = getProjectPath(directory);
+            let files: string[];
+            try { files = await readdir(projectDir); } catch { return []; }
+            const sessions = await Promise.all(
+                files.filter(f => f.endsWith('.jsonl') && UUID_RE.test(f.slice(0, -6))).map(async f => {
+                    const filePath = `${projectDir}/${f}`;
+                    const sessionId = f.slice(0, -6);
+                    const [updatedAt, title] = await Promise.all([
+                        stat(filePath).then(s => s.mtimeMs).catch(() => 0),
+                        readFile(filePath, 'utf-8').then(content => {
+                            let firstUser = '';
+                            for (const line of content.split('\n')) {
+                                if (!line.trim()) continue;
+                                try {
+                                    const obj = JSON.parse(line);
+                                    if (obj.type === 'summary' && obj.summary) return String(obj.summary).slice(0, 100);
+                                    if (obj.type === 'user' && !firstUser) {
+                                        const c = obj.message?.content;
+                                        firstUser = (typeof c === 'string' ? c : Array.isArray(c) ? c.filter((x: any) => x.type === 'text').map((x: any) => x.text).join(' ') : '').slice(0, 100);
+                                    }
+                                } catch {}
+                            }
+                            return firstUser || sessionId;
+                        }).catch(() => sessionId),
+                    ]);
+                    return { sessionId, title, updatedAt };
+                })
+            );
+            return sessions.sort((a, b) => b.updatedAt - a.updatedAt);
+        });
+
         // Register stop daemon handler
         this.rpcHandlerManager.registerHandler('stop-daemon', () => {
             logger.debug('[API MACHINE] Received stop-daemon RPC request');

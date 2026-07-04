@@ -36,10 +36,10 @@ import { useAllMachines, useLocalSetting, useSessions, useSetting, storage } fro
 import type { NewSessionAgentType } from '@/sync/persistence';
 import { sync } from '@/sync/sync';
 import { isMachineOnline } from '@/utils/machineUtils';
-import { machineSpawnNewSession } from '@/sync/ops';
+import { machineSpawnNewSession, listMachineClaudeSessions } from '@/sync/ops';
 import { createWorktree, listWorktrees } from '@/utils/worktree';
 import { resolveAbsolutePath } from '@/utils/pathUtils';
-import { formatPathRelativeToHome, formatLastSeen, getSessionName } from '@/utils/sessionUtils';
+import { formatPathRelativeToHome, formatLastSeen } from '@/utils/sessionUtils';
 import { useNavigateToSession } from '@/hooks/useNavigateToSession';
 import { useNewSessionDraft } from '@/hooks/useNewSessionDraft';
 import { useShallow } from 'zustand/react/shallow';
@@ -595,11 +595,24 @@ function NewSessionScreen() {
     }, [worktreeKey]);
 
     const [resumeSessionId, setResumeSessionId] = React.useState<string | null>(null);
+    const [resumableSessions, setResumableSessions] = React.useState<PickerItem[]>([]);
 
-    // Clear resume selection when path changes
+    // Load Claude Code sessions from machine filesystem when machine/path changes
     React.useEffect(() => {
         setResumeSessionId(null);
-    }, [selectedPath]);
+        setResumableSessions([]);
+        if (!selectedMachineId || !resolvedSelectedPath) return;
+        let cancelled = false;
+        listMachineClaudeSessions(selectedMachineId, resolvedSelectedPath).then(sessions => {
+            if (cancelled) return;
+            setResumableSessions(sessions.map(s => ({
+                key: s.sessionId,
+                label: s.title,
+                subtitle: formatLastSeen(s.updatedAt, false),
+            })));
+        });
+        return () => { cancelled = true; };
+    }, [selectedMachineId, resolvedSelectedPath]);
 
     // Local-only UI state (not persisted)
     const [permissionIndex, setPermissionIndex] = React.useState(0);
@@ -670,24 +683,6 @@ function NewSessionScreen() {
     const resolvedSelectedPath = React.useMemo(() => {
         return normalizePathForComparison(selectedPath, selectedHomeDir);
     }, [selectedHomeDir, selectedPath]);
-
-    // Sessions in the current path that can be resumed (have claudeSessionId)
-    const resumableSessions = React.useMemo<PickerItem[]>(() => {
-        if (!sessions || !resolvedSelectedPath) return [];
-        return (sessions as Session[])
-            .filter(s => typeof s !== 'string'
-                && s.metadata?.path === resolvedSelectedPath
-                && s.metadata?.claudeSessionId)
-            .sort((a, b) => (b as Session).updatedAt - (a as Session).updatedAt)
-            .map(s => {
-                const session = s as Session;
-                return {
-                    key: session.metadata!.claudeSessionId!,
-                    label: getSessionName(session),
-                    subtitle: formatLastSeen(session.updatedAt, false),
-                };
-            });
-    }, [sessions, resolvedSelectedPath]);
 
     const [debouncedResolvedSelectedPath, setDebouncedResolvedSelectedPath] = React.useState<string | null>(resolvedSelectedPath);
 
